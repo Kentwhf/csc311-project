@@ -78,7 +78,7 @@ class AutoEncoder(nn.Module):
         return out
 
 
-def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
+def train(model, lr, train_data, zero_train_data, valid_data, num_epoch, lamb=0):
     """ Train the neural network, where the objective also includes
     a regularizer.
 
@@ -164,19 +164,21 @@ def main():
     #####################################################################
 
     # Set model hyperparameters.
+    # Q2c
     num_question = train_matrix.shape[1]
-    k_list = {10, 50, 100, 200, 500}
+    k_list = [10, 50, 100, 200, 500]
+    lr = 0.01
+    num_epoch = 10
+
     for k in k_list:
         model = AutoEncoder(num_question, k)
-
         # Set optimization hyperparameters.
-        lr = 0.01
-        num_epoch = 10
-        lamb = None
-
-        train(model, lr, lamb, train_matrix, zero_train_matrix,
+        train(model, lr, train_matrix, zero_train_matrix,
               valid_data, num_epoch)
 
+    # Q2d
+    # Q2e
+    lamb_list = [0.001, 0.01, 0.1, 1]
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
