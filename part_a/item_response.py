@@ -1,6 +1,7 @@
 from utils import *
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def sigmoid(x):
@@ -25,17 +26,14 @@ def neg_log_likelihood(data, theta, beta):
     # Implement the function as described in the docstring.             #
     #####################################################################
     log_lklihood = 0.
-    print(theta.shape)
-    print(beta.shape)
-    # temp = -np.isnan(data).astype(int) + 1
     for i in range(len(theta)):
         for j in range(len(beta)):
-            if data[i, j] == 1 or 0:
-                log_lklihood += data[i, j] * (theta[i][0] - beta[j][0]) - np.log(1 + np.exp(theta[i][0] - beta[j][0]))
+            if data[i, j] == 0 or data[i, j] == 1:
+                log_lklihood += (data[i, j] * (theta[i] - beta[j]) - np.log1p(np.exp(theta[i] - beta[j])))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
-    return log_lklihood
+    return -log_lklihood[0]
 
 def update_theta_beta(data, lr, theta, beta):
     """ Update theta and beta using gradient descent.
@@ -58,11 +56,22 @@ def update_theta_beta(data, lr, theta, beta):
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
     #####################################################################
-    temp = (data == 1).astype(int)
+    # temp = (data == 1).astype(int)
     for i in range(len(theta)):
-        theta[i] -= lr * (-np.sum(sigmoid(theta[i] - beta)) + np.sum(temp[i, :]))
+        non_null_idx = np.where(~np.isnan(data[i, :]))[0]
+        temp = sigmoid(theta[i] - beta)
+
+        # print(data[i, :].shape)
+        # print(temp.shape)
+        # print(temp[non_null_idx].shape)
+        # print(non_null_idx.shape)
+        theta[i] += lr * (np.sum(data[i, :][non_null_idx]) - np.sum(temp[non_null_idx]))
+
     for j in range(len(beta)):
-        beta[j] -= lr * (np.sum(sigmoid(theta - beta[j])) - np.sum(temp[:, j]))
+        non_null_idx = np.where(~np.isnan(data[:, j]))[0]
+        temp = sigmoid(theta - beta[j])
+        beta[j] += lr * (-np.sum(data[:, j][non_null_idx]) + np.sum(temp[non_null_idx]))
+
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -85,9 +94,9 @@ def irt(train_sparse_matrix, train_data, val_data, lr, iterations):
     # TODO: Initialize theta and beta.
     theta = np.zeros(shape=(train_sparse_matrix.shape[0], 1))
     beta = np.zeros(shape=(train_sparse_matrix.shape[1], 1))
-    # np.random.seed(1)
-    # theta = np.random.rand(train_sparse_matrix.shape[0], 1)
-    # beta = np.random.rand(train_sparse_matrix.shape[1], 1)
+    np.random.seed(1)
+    theta = np.random.rand(train_sparse_matrix.shape[0], 1)
+    beta = np.random.rand(train_sparse_matrix.shape[1], 1)
 
     val_acc_lst, train_acc_lst = [], []
     val_log_likelihood, train_log_likelihood = [], []
@@ -96,16 +105,16 @@ def irt(train_sparse_matrix, train_data, val_data, lr, iterations):
     for i in range(iterations):
         # Log likelihood
         train_neg_lld = neg_log_likelihood(train_sparse_matrix, theta=theta, beta=beta)
-        train_log_likelihood.append(-train_neg_lld)
+        train_log_likelihood.append(train_neg_lld)
         val_neg_lld = neg_log_likelihood(val_sparse_matrix, theta=theta, beta=beta)
-        val_log_likelihood.append(-val_neg_lld)
+        val_log_likelihood.append(val_neg_lld)
 
         train_score = evaluate(data=train_data, theta=theta, beta=beta)
         train_acc_lst.append(train_score)
         val_score = evaluate(data=val_data, theta=theta, beta=beta)
         val_acc_lst.append(val_score)
 
-        print("NLLK: {} \t Train Score: {} \t Val Score: {}".format(train_neg_lld, train_score, val_score))
+        print("NLLK: {} \t Train Score: {} \t Validation Score: {}".format(train_neg_lld, train_score, val_score))
         theta, beta = update_theta_beta(train_sparse_matrix, lr, theta, beta)
 
     # TODO: You may change the return values to achieve what you want.
@@ -155,10 +164,23 @@ def main():
     # Tune learning rate and number of iterations. With the implemented #
     # code, report the validation and test accuracy.                    #
     #####################################################################
-    lr, iterations = 0.01, 10
+
+    # Part B
+    lr, iterations = 0.01, 20
     theta, beta, val_log_likelihood, train_log_likelihood = \
         irt(train_sparse_matrix, train_data, val_data, lr, iterations)
 
+    plt.plot(train_log_likelihood, label="train");
+    plt.plot(val_log_likelihood, label="valid");
+    plt.yscale("log");
+    plt.ylabel("Negative Log Likelihood");
+    plt.xlabel("Iteration");
+    plt.xticks(np.arange(0, iterations, 1));
+    plt.yticks(np.logspace(3, 5, 20));
+    plt.title("Neg Log Likelihood for Train and Validation Data");
+    plt.legend();
+    plt.savefig("../figs/Q2c.png");
+    plt.show()
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -167,7 +189,27 @@ def main():
     # TODO:                                                             #
     # Implement part (c)                                                #
     #####################################################################
-    pass
+
+    # Part C
+    val_score = evaluate(data=val_data, theta=theta, beta=beta)
+    test_score = evaluate(data=test_data, theta=theta, beta=beta)
+
+    print("Validation Accuracy: ", val_score)
+    print("Test Accuracy: ", test_score)
+
+    # Part D
+
+    selected_questions = np.array([100, 200, 300, 400, 500])
+    for selected in selected_questions:
+        plt.plot(np.arange(0, len(theta)), sigmoid(theta - beta[selected]).reshape(-1), label=f"Question {selected}");
+    plt.ylabel("Probability");
+    plt.xlabel("Theta");
+    plt.xticks(np.arange(0, len(theta), 100));
+    plt.title("Selected Questions Probability as a function of Theta");
+    plt.legend();
+    plt.show();
+    plt.savefig("../figs/Q2d.png");
+
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
