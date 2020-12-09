@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 from sklearn.impute import KNNImputer
 from utils import *
-import matplotlib.pyplot as plt
+
 
 def knn_impute_by_user(matrix, valid_data, k):
     """ Fill in the missing values using k-Nearest Neighbors based on

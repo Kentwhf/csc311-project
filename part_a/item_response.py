@@ -25,16 +25,17 @@ def neg_log_likelihood(data, theta, beta):
     # Implement the function as described in the docstring.             #
     #####################################################################
     log_lklihood = 0.
+    print(theta.shape)
+    print(beta.shape)
     # temp = -np.isnan(data).astype(int) + 1
     for i in range(len(theta)):
         for j in range(len(beta)):
             if data[i, j] == 1 or 0:
-                log_lklihood += data[i, j] * (theta[i] - beta[j]) - np.log(1 + np.exp(theta[i] - beta[j]))
+                log_lklihood += data[i, j] * (theta[i][0] - beta[j][0]) - np.log(1 + np.exp(theta[i][0] - beta[j][0]))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
-    return -log_lklihood[0]
-
+    return log_lklihood
 
 def update_theta_beta(data, lr, theta, beta):
     """ Update theta and beta using gradient descent.
