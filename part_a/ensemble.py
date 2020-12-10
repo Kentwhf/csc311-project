@@ -17,13 +17,13 @@ def knn(matrix, k):
 
 def ensemble_predict(data, knn_matrix, theta, beta, nn_zero_matrix, nn_model, threshold=0.5):
 
-    knn_preds = knn_predict(data, knn_matrix)
+    knn_preds = knn_predict(data, knn_matrix) #>= threshold
 
-    irt_preds = irt_predict(data, theta, beta)
+    irt_preds = irt_predict(data, theta, beta) #>= threshold
 
-    nn_preds = nn_predict(nn_zero_matrix, data, nn_model)
+    nn_preds = nn_predict(nn_zero_matrix, data, nn_model) #>= threshold
 
-    return ((nn_preds + irt_preds + knn_preds)/3) >= threshold
+    return ((knn_preds + irt_preds + nn_preds)/3) >= threshold
 
 
 def nn_predict(zero_data, valid_data, nn_model):

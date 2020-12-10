@@ -176,11 +176,11 @@ def main():
     plt.ylabel("Negative Log Likelihood");
     plt.xlabel("Iteration");
     plt.xticks(np.arange(0, iterations, 1));
-    plt.yticks(np.logspace(3, 5, 20));
+    # plt.yticks(np.logspace(3, 5, 20));
     plt.title("Neg Log Likelihood for Train and Validation Data");
     plt.legend();
     plt.savefig("../figs/Q2c.png");
-    plt.show()
+    plt.show();
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -198,17 +198,17 @@ def main():
     print("Test Accuracy: ", test_score)
 
     # Part D
-
     selected_questions = np.array([100, 200, 300, 400, 500])
     for selected in selected_questions:
-        plt.plot(np.arange(0, len(theta)), sigmoid(theta - beta[selected]).reshape(-1), label=f"Question {selected}");
+        plt.plot(np.arange(0, len(theta)), sigmoid(theta - beta[selected]).reshape(-1), label=f"Question {selected}", linewidth=0.5);
     plt.ylabel("Probability");
     plt.xlabel("Theta");
     plt.xticks(np.arange(0, len(theta), 100));
     plt.title("Selected Questions Probability as a function of Theta");
     plt.legend();
-    plt.show();
     plt.savefig("../figs/Q2d.png");
+    plt.show();
+
 
     #####################################################################
     #                       END OF YOUR CODE                            #
