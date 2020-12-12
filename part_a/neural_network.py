@@ -202,49 +202,49 @@ def main():
     k_star = 50
     lr_star = 0.01
     epoch_star = 40
-    model_star = AutoEncoder(num_question, k_star)
-    epochs, train_losses, val_accs = train(model_star, lr_star, train_matrix, zero_train_matrix,
-                  valid_data, epoch_star)
-
-    fig, ax = plt.subplots(ncols=2, figsize=(30, 12));
-    # Plot Train Loss
-    ax[0].plot(epochs, train_losses, label="train loss");
-    ax[0].set_title("Train Loss by Iteration");
-    ax[0].set_xlabel("Epoch");
-    ax[0].set_ylabel("Loss");
-
-    # Plot Validation Accuracy
-    ax[1].plot(epochs, val_accs, label="validation");
-    ax[1].set_title("Validation Accuracy by Iteration");
-    ax[1].set_xlabel("Epoch");
-    ax[1].set_ylabel("Accuracy");
-
-    print("Validation Accuracy: ", val_accs[-1]);
-    print("Test Accuracy: ", evaluate(model_star, zero_train_matrix, test_data))
-
-    fig.savefig("../figs/Q3d.png");
+    # model_star = AutoEncoder(num_question, k_star)
+    # epochs, train_losses, val_accs = train(model_star, lr_star, train_matrix, zero_train_matrix,
+    #               valid_data, epoch_star)
+    #
+    # fig, ax = plt.subplots(ncols=2, figsize=(30, 12));
+    # # Plot Train Loss
+    # ax[0].plot(epochs, train_losses, label="train loss");
+    # ax[0].set_title("Train Loss by Iteration");
+    # ax[0].set_xlabel("Epoch");
+    # ax[0].set_ylabel("Loss");
+    #
+    # # Plot Validation Accuracy
+    # ax[1].plot(epochs, val_accs, label="validation");
+    # ax[1].set_title("Validation Accuracy by Iteration");
+    # ax[1].set_xlabel("Epoch");
+    # ax[1].set_ylabel("Accuracy");
+    #
+    # print("Validation Accuracy: ", val_accs[-1]);
+    # print("Test Accuracy: ", evaluate(model_star, zero_train_matrix, test_data))
+    #
+    # fig.savefig("../figs/Q3d.png");
 
     # Q2e
-    lamb_list = [0.001, 0.01, 0.1, 1]
+    lamb_list = [0, 0.001, 0.01, 0.1, 1]
 
     fig, ax = plt.subplots(ncols=2, figsize=(30, 12));
     for lamb in lamb_list:
         model_star = AutoEncoder(num_question, k_star)
         epochs, train_losses, val_accs = train(model_star, lr_star, train_matrix, zero_train_matrix,
                                            valid_data, epoch_star, lamb)
-    #     ax[0].plot(epochs, train_losses, label=f"lamb={lamb}");
-    #     ax[1].plot(epochs, val_accs, label=f"lamb={lamb}");
-    #
-    # ax[0].set_title("Train Loss by Iteration");
-    # ax[0].set_xlabel("Epoch");
-    # ax[0].set_ylabel("Loss");
-    # ax[0].legend();
-    #
-    # ax[1].set_title("Validation Accuracy by Iteration");
-    # ax[1].set_xlabel("Epoch");
-    # ax[1].set_ylabel("Accuracy");
-    # ax[1].legend();
-    # fig.savefig("../figs/Q3e.png");
+        ax[0].plot(epochs, train_losses, label=f"lamb={lamb}");
+        ax[1].plot(epochs, val_accs, label=f"lamb={lamb}");
+
+    ax[0].set_title("Train Loss by Iteration");
+    ax[0].set_xlabel("Epoch");
+    ax[0].set_ylabel("Loss");
+    ax[0].legend();
+
+    ax[1].set_title("Validation Accuracy by Iteration");
+    ax[1].set_xlabel("Epoch");
+    ax[1].set_ylabel("Accuracy");
+    ax[1].legend();
+    fig.savefig("../figs/Q3e.png");
 
     print("Validation Accuracy: ", val_accs[-1]);
     print("Test Accuracy: ", evaluate(model_star, zero_train_matrix, test_data))
