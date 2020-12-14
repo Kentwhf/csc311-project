@@ -129,11 +129,13 @@ def update_theta_beta(data, lr, theta, beta):
     q_id_arr = np.array(data["question_id"])
     c_id_arr = np.array(data["is_correct"])
 
+    theta_copy = theta.copy()
+    beta_copy = beta.copy()
     for i in range(len(theta)):
-        theta[i] -= lr * (np.sum(sigmoid(theta[i] - beta)[q_id_arr[u_id_arr == i]]) - np.sum(c_id_arr[u_id_arr == i]))
+        theta[i] -= lr * (np.sum(sigmoid(theta_copy[i] - beta_copy)[q_id_arr[u_id_arr == i]]) - np.sum(c_id_arr[u_id_arr == i]))
 
     for j in range(len(beta)):
-        beta[j] -= lr * (np.sum(c_id_arr[q_id_arr == j]) - np.sum(sigmoid(theta - beta[j])[u_id_arr[q_id_arr == j]]))
+        beta[j] -= lr * (np.sum(c_id_arr[q_id_arr == j]) - np.sum(sigmoid(theta_copy - beta_copy[j])[u_id_arr[q_id_arr == j]]))
 
     #####################################################################
     #                       END OF YOUR CODE                            #
@@ -229,6 +231,7 @@ def main():
 
     # Part B
     lr, iterations = 0.01, 20
+
     theta, beta, val_log_likelihood, train_log_likelihood = \
         irt(train_data, val_data, lr, iterations)
 
@@ -254,6 +257,12 @@ def main():
     # Part C
     val_score = evaluate(data=val_data, theta=theta, beta=beta)
     test_score = evaluate(data=test_data, theta=theta, beta=beta)
+
+    np.save("theta.npy", theta)
+    np.save("beta.npy", beta)
+    np.save("val_nllk.npy", val_log_likelihood)
+    np.save("train_nllk.npy", train_log_likelihood)
+
 
     print("Validation Accuracy: ", val_score)
     print("Test Accuracy: ", test_score)
