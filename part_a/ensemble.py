@@ -25,8 +25,6 @@ def sample_by_student_only(data, num_resamples):
         resampled_data.append(sampled_dict)
     return resampled_data
 
-
-
 def sample_by_student_question(data, num_resamples):
 
     # Sample by student
@@ -45,28 +43,6 @@ def sample_by_student_question(data, num_resamples):
     return resampled_data
 
 
-# def knn(matrix, k):
-#     nbrs = KNNImputer(n_neighbors=k)
-#     # We use NaN-Euclidean distance measure.
-#     mat = nbrs.fit_transform(matrix)
-#     return mat
-#
-# def ensemble_predict_by_avg(data, knn_matrix, theta, beta, nn_zero_matrix, nn_model, threshold=0.5):
-#
-#     knn_preds = knn_predict(data, knn_matrix) #>= threshold
-#     irt_preds = irt_predict(data, theta, beta) #>= threshold
-#     nn_preds = nn_predict(nn_zero_matrix, data, nn_model) #>= threshold
-#     return ((knn_preds + irt_preds + nn_preds)/3) >= threshold
-#
-#
-# def ensemble_predict_by_majority(data, knn_matrix, theta, beta, nn_zero_matrix, nn_model, threshold=0.5):
-#
-#     knn_preds = knn_predict(data, knn_matrix) >= threshold
-#     irt_preds = irt_predict(data, theta, beta) >= threshold
-#     nn_preds = nn_predict(nn_zero_matrix, data, nn_model) >= threshold
-#     return ((knn_preds.astype(int) + irt_preds.astype(int) + nn_preds.astype(int))/3) >= threshold
-
-
 def ensemble_predict_irt(data, theta_list, beta_list, majority=False, threshold=0.5):
     ensemble_pred = np.zeros(len(data["is_correct"]))
     for idx, theta in enumerate(theta_list):
@@ -77,19 +53,6 @@ def ensemble_predict_irt(data, theta_list, beta_list, majority=False, threshold=
 
         ensemble_pred += temp_pred
     return ((ensemble_pred/len(theta_list)) >= threshold).astype(int)
-
-
-# def nn_predict(zero_data, valid_data, nn_model):
-#     nn_model.eval()
-#     nn_preds = []
-#     for i, u in enumerate(valid_data["user_id"]):
-#         inputs = Variable(zero_data[u]).unsqueeze(0)
-#         output = nn_model(inputs)
-#
-#         guess = output[0][valid_data["question_id"][i]].item()
-#         nn_preds.append(guess)
-#     nn_preds = np.array(nn_preds)
-#     return nn_preds
 
 
 def irt_predict(valid_data, theta, beta, binary=False, threshold=0.5):
@@ -103,17 +66,6 @@ def irt_predict(valid_data, theta, beta, binary=False, threshold=0.5):
     if binary:
         return (irt_preds >= threshold).astype(int)
     return irt_preds
-
-#
-# def knn_predict(valid_data, knn_matrix):
-#     knn_preds = []
-#     for i in range(len(valid_data["user_id"])):
-#         cur_user_id = valid_data["user_id"][i]
-#         cur_question_id = valid_data["question_id"][i]
-#         knn_preds.append(knn_matrix[cur_user_id, cur_question_id])
-#     knn_preds = np.array(knn_preds)
-#     return knn_preds
-
 
 def evaluate(data, pred):
     return np.sum((np.array(data["is_correct"]) == np.array(pred))) / len(data["is_correct"])
