@@ -40,12 +40,15 @@ def neg_log_likelihood(data, theta, beta, alpha, lower, upper):
     for idx, u_id in enumerate(data["user_id"]):
         q_id = data["question_id"][idx]
 
-        k = alpha[u_id] * (theta[u_id] - beta[q_id])
+        k = alpha[q_id] * (theta[u_id] - beta[q_id])
 
+        # if 1 - upper[u_id] + (upper[u_id] - lower[u_id]) / (1 + np.exp(k)) <= 0:
+        #     print(1 - upper[u_id] + (upper[u_id] - lower[u_id]) / (1 + np.exp(k)))
         if data["is_correct"][idx] == 0:
-            log_lklihood += np.log(lower[u_id] + (upper[u_id] - lower[u_id]) / (1 + np.exp(k)))
+            log_lklihood += np.log(1 - upper[u_id] + (upper[u_id] - lower[u_id]) / (1 + np.exp(k)))
         elif data["is_correct"][idx] == 1:
             log_lklihood += np.log(lower[u_id] + (upper[u_id] - lower[u_id]) * sigmoid(k))
+
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -96,6 +99,20 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
             else:
                 k = alpha_copy[j] * (theta_copy[i] - beta_copy[j])
                 coef = (upper_copy[i] - lower_copy[i]) * alpha_copy[j]
+
+                temp_theta_grad = coef * sigmoid(k)/(1 + np.exp(k))
+                temp_upper_grad = sigmoid(k)
+                temp_lower_grad = 1/(1 + np.exp(k))
+
+                if q_id == 1:
+                    theta_grad += temp_theta_grad
+                    upper_grad.append(temp_upper_grad)
+                    lower_grad.append(temp_lower_grad)
+                else:
+                    theta_grad -= temp_theta_grad
+                    upper_grad.append(-temp_upper_grad)
+                    lower_grad.append(-temp_lower_grad)
+
                 if q_id == 1:
                     theta_grad += coef * sigmoid(k) / (upper_copy[i] * np.exp(k) + lower_copy[i])
                     upper_grad.append(-np.exp(k)/(lower_copy[i] + upper_copy[i] * np.exp(k)))
@@ -110,8 +127,8 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
         upper[i] += lr * np.mean(upper_grad)
         lower[i] += lr * np.mean(lower_grad)
 
-    # upper[upper >= 1] = 1
-    # lower[lower <= 0] = 0
+    upper[upper >= 1] = 1
+    lower[lower <= 0] = 0
 
     for j in range(len(beta)):
         beta_grad = 0.
@@ -123,6 +140,16 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
             else:
                 k = alpha_copy[j] * (theta_copy[i] - beta_copy[j])
                 coef = (upper_copy[i] - lower_copy[i]) * alpha_copy[j]
+
+                temp_beta_grad = coef * sigmoid(k) / (1 + np.exp(k))
+                temp_alpha_grad = coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (1 + np.exp(k))
+
+                if u_id == 0:
+                    alpha_grad += temp_alpha_grad
+                    beta_grad += temp_beta_grad
+                else:
+                    alpha_grad -= temp_alpha_grad
+                    beta_grad -= temp_beta_grad
                 if u_id == 1:
                     beta_grad += -coef * sigmoid(k) / (upper_copy[i] * np.exp(k) + lower_copy[i])
                     alpha_grad += -coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (
@@ -159,13 +186,14 @@ def irt(train_data, val_data, lr, iterations):
     beta = np.zeros(1774)
     alpha = np.ones(1774)
 
-    lower = np.ones(542) * 0.00001
-    upper = np.ones(542)
+    lower = np.ones(542) * 0.00
+    upper = np.ones(542) * 1.00
 
     val_acc_lst, train_acc_lst = [], []
     val_log_likelihood, train_log_likelihood = [], []
 
     for i in range(iterations):
+
         # Log likelihood
         train_neg_lld = neg_log_likelihood(train_data, theta=theta, beta=beta, alpha=alpha, lower=lower, upper=upper)
         train_log_likelihood.append(train_neg_lld)
@@ -179,11 +207,11 @@ def irt(train_data, val_data, lr, iterations):
         #
         print("NLLK: {} \t Train Score: {} \t Validation Score: {}".format(train_neg_lld, train_score, val_score))
         theta, beta, alpha, lower, upper = update_params(train_data, lr, theta, beta, alpha, lower, upper)
-        # print("Lower Mean: ", np.mean(lower), " Max: ", np.max(lower), " Min: ", np.min(lower))
-        # print("Upper Mean: ", np.mean(upper), " Max: ", np.max(upper), " Min: ", np.min(upper))
-        # print("Theta Mean: ", np.mean(theta), " Max: ", np.max(theta), " Min: ", np.min(theta))
-        # print("Beta Mean: ", np.mean(beta), " Max: ", np.max(beta), " Min: ", np.min(beta))
-        # print("Alpha Mean: ", np.mean(alpha), " Max: ", np.max(alpha), " Min: ", np.min(alpha))
+        print("Lower Mean: ", np.mean(lower), " Max: ", np.max(lower), " Min: ", np.min(lower))
+        print("Upper Mean: ", np.mean(upper), " Max: ", np.max(upper), " Min: ", np.min(upper))
+        print("Theta Mean: ", np.mean(theta), " Max: ", np.max(theta), " Min: ", np.min(theta))
+        print("Beta Mean: ", np.mean(beta), " Max: ", np.max(beta), " Min: ", np.min(beta))
+        print("Alpha Mean: ", np.mean(alpha), " Max: ", np.max(alpha), " Min: ", np.min(alpha))
 
     # TODO: You may change the return values to achieve what you want.
     return theta, beta, alpha, lower, upper, val_log_likelihood, train_log_likelihood
@@ -367,22 +395,23 @@ if __name__ == "__main__":
     ax.set_xlabel("Alpha");
     ax.set_ylabel("Beta");
     ax.set_zlabel("Probability");
+    plt.show();
 
-    fig, ax = plt.subplots(ncols=2, figsize=(18, 6))
-
-    upper.sort()
-    ax[0].hist(upper, bins=30);
-    ax[0].legend();
-    ax[0].set_title("Upper bound on correctness");
-    ax[0].set_ylabel("Number of students");
-    ax[0].set_xlabel("Upper");
-
-    lower.sort()
-    ax[1].hist(lower, bins=30);
-    ax[1].legend();
-    ax[1].set_title("Lower bound on correctness");
-    ax[1].set_ylabel("Number of students");
-    ax[1].set_xlabel("Lower");
+    # fig, ax = plt.subplots(ncols=2, figsize=(18, 6))
+    #
+    # upper.sort()
+    # ax[0].hist(upper, bins=30);
+    # # ax[0].legend();
+    # ax[0].set_title("Upper bound on correctness");
+    # ax[0].set_ylabel("Number of students");
+    # ax[0].set_xlabel("Upper");
+    #
+    # lower.sort()
+    # ax[1].hist(lower, bins=30);
+    # ax[1].set_title("Lower bound on correctness");
+    # ax[1].set_ylabel("Number of students");
+    # ax[1].set_xlabel("Lower");
+    # plt.show();
 
     hard_question_ids = np.argsort(beta)[:89]
     easy_question_ids = np.argsort(beta)[-89:]
