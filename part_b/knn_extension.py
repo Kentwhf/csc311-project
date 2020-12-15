@@ -115,8 +115,6 @@ def fast_cosine(a, b, missing_values):
     a_norm = norm(a)  # The sum function ignores the masked values.
     b_norm = norm(b)  # The sum function ignores the masked values.
 
-    print(a_norm)
-
     if a_norm == 0 or b_norm == 0:
         return 0
     return (np.nansum(a*b)) / (a_norm*b_norm)
