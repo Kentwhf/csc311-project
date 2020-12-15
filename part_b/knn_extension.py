@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.impute import KNNImputer
 from utils import *
+from numpy.linalg import norm
 
 
 def knn_impute_by_user(matrix, valid_data, k):
@@ -107,13 +108,15 @@ def main():
 
 
 def fast_cosine(a, b, missing_values):
-    from scipy.spatial import distance
-    from numpy.linalg import norm
-    a = np.ma.array(a, mask=np.isnan(a))  # Use a mask to mark the NaNs
-    b = np.ma.array(b, mask=np.isnan(b))  # Use a mask to mark the NaNs
+    # from scipy.spatial import distance
+    # a = np.ma.array(a, mask=np.isnan(a))  # Use a mask to mark the NaNs
+    # b = np.ma.array(b, mask=np.isnan(b))  # Use a mask to mark the NaNs
 
-    a_norm = norm(a)  # The sum function ignores the masked values.
-    b_norm = norm(b)  # The sum function ignores the masked values.
+    # a_norm = norm(a)  # The sum function ignores the masked values.
+    # b_norm = norm(b)  # The sum function ignores the masked values.
+
+    a_norm = norm(a[~np.isnan(a)])
+    b_norm = norm(b[~np.isnan(b)])
 
     if a_norm == 0 or b_norm == 0:
         return 0
