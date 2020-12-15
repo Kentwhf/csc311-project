@@ -100,18 +100,18 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
                 k = alpha_copy[j] * (theta_copy[i] - beta_copy[j])
                 coef = (upper_copy[i] - lower_copy[i]) * alpha_copy[j]
 
-                temp_theta_grad = coef * sigmoid(k)/(1 + np.exp(k))
-                temp_upper_grad = sigmoid(k)
-                temp_lower_grad = 1/(1 + np.exp(k))
+                # temp_theta_grad = coef * sigmoid(k)/(1 + np.exp(k))
+                # temp_upper_grad = sigmoid(k)
+                # temp_lower_grad = 1/(1 + np.exp(k))
 
-                if q_id == 1:
-                    theta_grad += temp_theta_grad
-                    upper_grad.append(temp_upper_grad)
-                    lower_grad.append(temp_lower_grad)
-                else:
-                    theta_grad -= temp_theta_grad
-                    upper_grad.append(-temp_upper_grad)
-                    lower_grad.append(-temp_lower_grad)
+                # if q_id == 1:
+                #     theta_grad += temp_theta_grad
+                #     upper_grad.append(temp_upper_grad)
+                #     lower_grad.append(temp_lower_grad)
+                # else:
+                #     theta_grad -= temp_theta_grad
+                #     upper_grad.append(-temp_upper_grad)
+                #     lower_grad.append(-temp_lower_grad)
 
                 if q_id == 1:
                     theta_grad += coef * sigmoid(k) / (upper_copy[i] * np.exp(k) + lower_copy[i])
@@ -119,9 +119,9 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
                     lower_grad.append(1/(lower_copy[i] + upper_copy[i] * np.exp(k)))
 
                 elif q_id == 0:
-                    theta_grad += -coef * sigmoid(k) / (lower_copy[i] * np.exp(k) + upper_copy[i])
-                    upper_grad.append(-1/(upper_copy[i] + lower_copy[i] * np.exp(k)))
-                    lower_grad.append(np.exp(k)/(upper_copy[i] + lower_copy[i] * np.exp(k)))
+                    theta_grad += coef * sigmoid(k) / ((upper_copy[i] - 1) * np.exp(k) + lower_copy[i] - 1)
+                    upper_grad.append(-np.exp(k)/((upper_copy[i] - 1) * np.exp(k) + lower_copy[i] - 1))
+                    lower_grad.append(np.exp(k)/((upper_copy[i] - 1) * np.exp(k) + lower_copy[i] - 1))
 
         theta[i] += lr * theta_grad
         upper[i] += lr * np.mean(upper_grad)
@@ -141,23 +141,22 @@ def update_params(data, lr, theta, beta, alpha, lower, upper):
                 k = alpha_copy[j] * (theta_copy[i] - beta_copy[j])
                 coef = (upper_copy[i] - lower_copy[i]) * alpha_copy[j]
 
-                temp_beta_grad = coef * sigmoid(k) / (1 + np.exp(k))
-                temp_alpha_grad = coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (1 + np.exp(k))
-
-                if u_id == 0:
-                    alpha_grad += temp_alpha_grad
-                    beta_grad += temp_beta_grad
-                else:
-                    alpha_grad -= temp_alpha_grad
-                    beta_grad -= temp_beta_grad
+                # temp_beta_grad = coef * sigmoid(k) / (1 + np.exp(k))
+                # temp_alpha_grad = coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (1 + np.exp(k))
+                #
+                # if u_id == 0:
+                #     alpha_grad += temp_alpha_grad
+                #     beta_grad += temp_beta_grad
+                # else:
+                #     alpha_grad -= temp_alpha_grad
+                #     beta_grad -= temp_beta_grad
                 if u_id == 1:
                     beta_grad += -coef * sigmoid(k) / (upper_copy[i] * np.exp(k) + lower_copy[i])
                     alpha_grad += -coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (
                             upper_copy[i] * np.exp(k) + lower_copy[i])
                 elif u_id == 0:
-                    beta_grad += coef * sigmoid(k) / (lower_copy[i] * np.exp(k) + upper_copy[i])
-                    alpha_grad += coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / (
-                            lower_copy[i] * np.exp(k) + upper_copy[i])
+                    beta_grad += -coef * sigmoid(k) / ((upper_copy[i] - 1) * np.exp(k) + lower_copy[i] - 1)
+                    alpha_grad += -coef * sigmoid(k) * (theta_copy[i] - beta_copy[j]) / ((upper_copy[i] - 1) * np.exp(k) + lower_copy[i] - 1)
 
         beta[j] += lr * beta_grad
         alpha[j] += lr * alpha_grad
