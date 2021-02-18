@@ -9,32 +9,6 @@ def sigmoid(x):
     """
     return np.exp(x) / (1 + np.exp(x))
 
-#
-# def neg_log_likelihood(data, theta, beta):
-#     """ Compute the negative log-likelihood.
-#
-#     You may optionally replace the function arguments to receive a matrix.
-#
-#     :param data: A dictionary {user_id: list, question_id: list,
-#     is_correct: list}
-#     :param theta: Vector
-#     :param beta: Vector
-#     :return: float
-#     """
-#     #####################################################################
-#     # TODO:                                                             #
-#     # Implement the function as described in the docstring.             #
-#     #####################################################################
-#     log_lklihood = 0.
-#     for i in range(len(theta)):
-#         for j in range(len(beta)):
-#             if data[i, j] == 0 or data[i, j] == 1:
-#                 log_lklihood += (data[i, j] * (theta[i] - beta[j]) - np.log1p(np.exp(theta[i] - beta[j])))
-#     #####################################################################
-#     #                       END OF YOUR CODE                            #
-#     #####################################################################
-#     return -log_lklihood[0]
-
 def neg_log_likelihood(data, theta, beta):
     """ Compute the negative log-likelihood.
 
@@ -60,48 +34,6 @@ def neg_log_likelihood(data, theta, beta):
     #                       END OF YOUR CODE                            #
     #####################################################################
     return -log_lklihood
-#
-# def update_theta_beta(data, lr, theta, beta):
-#     """ Update theta and beta using gradient descent.
-#
-#     You are using alternating gradient descent. Your update should look:
-#     for i in iterations ...
-#         theta <- new_theta
-#         beta <- new_beta
-#
-#     You may optionally replace the function arguments to receive a matrix.
-#
-#     :param data: A dictionary {user_id: list, question_id: list,
-#     is_correct: list}
-#     :param lr: float
-#     :param theta: Vector
-#     :param beta: Vector
-#     :return: tuple of vectors
-#     """
-#     #####################################################################
-#     # TODO:                                                             #
-#     # Implement the function as described in the docstring.             #
-#     #####################################################################
-#     # temp = (data == 1).astype(int)
-#     for i in range(len(theta)):
-#         non_null_idx = np.where(~np.isnan(data[i, :]))[0]
-#         temp = sigmoid(theta[i] - beta)
-#
-#         # print(data[i, :].shape)
-#         # print(temp.shape)
-#         # print(temp[non_null_idx].shape)
-#         # print(non_null_idx.shape)
-#         theta[i] += lr * (np.sum(data[i, :][non_null_idx]) - np.sum(temp[non_null_idx]))
-#
-#     for j in range(len(beta)):
-#         non_null_idx = np.where(~np.isnan(data[:, j]))[0]
-#         temp = sigmoid(theta - beta[j])
-#         beta[j] += lr * (-np.sum(data[:, j][non_null_idx]) + np.sum(temp[non_null_idx]))
-#
-#     #####################################################################
-#     #                       END OF YOUR CODE                            #
-#     #####################################################################
-#     return theta, beta
 
 def update_theta_beta(data, lr, theta, beta):
     """ Update theta and beta using gradient descent.

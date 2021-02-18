@@ -40,7 +40,7 @@ def neg_log_likelihood(data, theta, beta, alpha, lower, upper):
     for idx, u_id in enumerate(data["user_id"]):
         q_id = data["question_id"][idx]
 
-        k = alpha[u_id] * (theta[u_id] - beta[q_id])
+        k = alpha[q_id] * (theta[u_id] - beta[q_id])
 
         if data["is_correct"][idx] == 0:
             log_lklihood += np.log(lower[u_id] + (upper[u_id] - lower[u_id]) / (1 + np.exp(k)))
@@ -152,9 +152,7 @@ def irt(train_data, val_data, lr, iterations):
     :return: (theta, beta, val_acc_lst)
     """
     # TODO: Initialize theta and beta.
-    # theta = np.zeros(542)
-    # beta = np.zeros(1774)
-    # np.random.seed(1)
+
     theta = np.zeros(542)
     beta = np.zeros(1774)
     alpha = np.ones(1774)
@@ -179,11 +177,6 @@ def irt(train_data, val_data, lr, iterations):
         #
         print("NLLK: {} \t Train Score: {} \t Validation Score: {}".format(train_neg_lld, train_score, val_score))
         theta, beta, alpha, lower, upper = update_params(train_data, lr, theta, beta, alpha, lower, upper)
-        # print("Lower Mean: ", np.mean(lower), " Max: ", np.max(lower), " Min: ", np.min(lower))
-        # print("Upper Mean: ", np.mean(upper), " Max: ", np.max(upper), " Min: ", np.min(upper))
-        # print("Theta Mean: ", np.mean(theta), " Max: ", np.max(theta), " Min: ", np.min(theta))
-        # print("Beta Mean: ", np.mean(beta), " Max: ", np.max(beta), " Min: ", np.min(beta))
-        # print("Alpha Mean: ", np.mean(alpha), " Max: ", np.max(alpha), " Min: ", np.min(alpha))
 
     # TODO: You may change the return values to achieve what you want.
     return theta, beta, alpha, lower, upper, val_log_likelihood, train_log_likelihood

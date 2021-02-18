@@ -177,52 +177,52 @@ def main():
     # Set model hyperparameters.
     # Q2c
     num_question = train_matrix.shape[1]
-    # k_list = [10, 50, 100, 200, 500]
-    # lr_list = [0.001, 0.01, 0.1]
-    # num_epoch_list = [5, 20, 40]
-    # fig, ax = plt.subplots(nrows=len(num_epoch_list), ncols=len(lr_list), figsize=(18,12))
-    # for i, num_epoch in enumerate(num_epoch_list):
-    #     for j, lr in enumerate(lr_list):
-    #         for k in k_list:
-    #             model = AutoEncoder(num_question, k)
-    #             # Set optimization hyperparameters.
-    #             epochs, train_losses, val_accs = train(model, lr, train_matrix, zero_train_matrix,
-    #               valid_data, num_epoch)
-    #
-    #             ax[i][j].plot(epochs, val_accs, label=f"K = {k}");
-    #             ax[i][j].set_xticks(np.arange(0, num_epoch, num_epoch//5));
-    #             ax[i][j].set_ylabel("Validation Accuracy %")
-    #             ax[i][j].set_title(f"Epoch: {num_epoch}, LR: {lr}", fontsize=10);
-    #             fig.savefig("../figs/Q3c.png");
-    #
-    #         ax[i][j].legend(loc='upper left', prop={'size': 6});
-    # fig.savefig("../figs/Q3c.png");
+    k_list = [10, 50, 100, 200, 500]
+    lr_list = [0.001, 0.01, 0.1]
+    num_epoch_list = [5, 20, 40]
+    fig, ax = plt.subplots(nrows=len(num_epoch_list), ncols=len(lr_list), figsize=(18,12))
+    for i, num_epoch in enumerate(num_epoch_list):
+        for j, lr in enumerate(lr_list):
+            for k in k_list:
+                model = AutoEncoder(num_question, k)
+                # Set optimization hyperparameters.
+                epochs, train_losses, val_accs = train(model, lr, train_matrix, zero_train_matrix,
+                  valid_data, num_epoch)
+
+                ax[i][j].plot(epochs, val_accs, label=f"K = {k}");
+                ax[i][j].set_xticks(np.arange(0, num_epoch, num_epoch//5));
+                ax[i][j].set_ylabel("Validation Accuracy %")
+                ax[i][j].set_title(f"Epoch: {num_epoch}, LR: {lr}", fontsize=10);
+                fig.savefig("../figs/Q3c.png");
+
+            ax[i][j].legend(loc='upper left', prop={'size': 6});
+    fig.savefig("../figs/Q3c.png");
 
     # Q2d
     k_star = 50
     lr_star = 0.01
     epoch_star = 40
-    # model_star = AutoEncoder(num_question, k_star)
-    # epochs, train_losses, val_accs = train(model_star, lr_star, train_matrix, zero_train_matrix,
-    #               valid_data, epoch_star)
-    #
-    # fig, ax = plt.subplots(ncols=2, figsize=(30, 12));
-    # # Plot Train Loss
-    # ax[0].plot(epochs, train_losses, label="train loss");
-    # ax[0].set_title("Train Loss by Iteration");
-    # ax[0].set_xlabel("Epoch");
-    # ax[0].set_ylabel("Loss");
-    #
-    # # Plot Validation Accuracy
-    # ax[1].plot(epochs, val_accs, label="validation");
-    # ax[1].set_title("Validation Accuracy by Iteration");
-    # ax[1].set_xlabel("Epoch");
-    # ax[1].set_ylabel("Accuracy");
-    #
-    # print("Validation Accuracy: ", val_accs[-1]);
-    # print("Test Accuracy: ", evaluate(model_star, zero_train_matrix, test_data))
-    #
-    # fig.savefig("../figs/Q3d.png");
+    model_star = AutoEncoder(num_question, k_star)
+    epochs, train_losses, val_accs = train(model_star, lr_star, train_matrix, zero_train_matrix,
+                  valid_data, epoch_star)
+
+    fig, ax = plt.subplots(ncols=2, figsize=(30, 12));
+    # Plot Train Loss
+    ax[0].plot(epochs, train_losses, label="train loss");
+    ax[0].set_title("Train Loss by Iteration");
+    ax[0].set_xlabel("Epoch");
+    ax[0].set_ylabel("Loss");
+
+    # Plot Validation Accuracy
+    ax[1].plot(epochs, val_accs, label="validation");
+    ax[1].set_title("Validation Accuracy by Iteration");
+    ax[1].set_xlabel("Epoch");
+    ax[1].set_ylabel("Accuracy");
+
+    print("Validation Accuracy: ", val_accs[-1]);
+    print("Test Accuracy: ", evaluate(model_star, zero_train_matrix, test_data))
+
+    fig.savefig("../figs/Q3d.png");
 
     # Q2e
     lamb_list = [0, 0.001, 0.01, 0.1, 1]
